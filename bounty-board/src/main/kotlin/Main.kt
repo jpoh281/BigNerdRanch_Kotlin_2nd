@@ -1,8 +1,12 @@
 package main.kotlin
 
 const val HERO_NAME = "Madrigal"
-var playerLevel = 5
+ var playerLevel : Int = 5
+// var playerLevel : UInt = 5.toUInt()
+// var playerLevel : UInt = 5u
+
 fun main() {
+
     println("The hero announces her presence to the world.")
     println(HERO_NAME)
     println(playerLevel)
@@ -19,6 +23,7 @@ fun main() {
     forgeItem(itemName = "gauntlet", encrustWithJewels = true, material = "bronze", quantity = 1)
     shouldReturnAString()
 }
+
 
 private fun obtainQuest(
     playerLevel: Int,
