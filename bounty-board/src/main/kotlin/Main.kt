@@ -1,27 +1,34 @@
 package main.kotlin
 
 const val HERO_NAME = "Madrigal"
- var playerLevel : Int = 5
+var playerLevel: Int = 0
 // var playerLevel : UInt = 5.toUInt()
 // var playerLevel : UInt = 5u
 
 fun main() {
 
-    println("The hero announces her presence to the world.")
-    println(HERO_NAME)
-    println(playerLevel)
+    println("$HERO_NAME announces her presence to the world.")
+    println("What level is $HERO_NAME?")
+
+    var playerLevelInput = readLine()!!
+    playerLevel = if (playerLevelInput.matches("""\d+""".toRegex())) {
+        playerLevelInput.toInt()
+    } else {
+        1
+    }
+    println("$HERO_NAME's level is $playerLevel.")
 
     readBountyBoard()
 
     println("Time passes...")
-    println("The hero returns from her quest")
+    println("$HERO_NAME returns from her quest")
 
-    playerLevel++
+    playerLevel += 1
     println(playerLevel)
     readBountyBoard()
 
     forgeItem(itemName = "gauntlet", encrustWithJewels = true, material = "bronze", quantity = 1)
-    shouldReturnAString()
+//    shouldReturnAString()
 }
 
 
@@ -48,8 +55,12 @@ private fun obtainQuest(
 }
 
 private fun readBountyBoard() {
-    println("The hero approaches the bounty board. It reads :")
-    println(obtainQuest(playerLevel))
+    println(
+        """
+        "$HERO_NAME approaches the bounty board. It reads :"
+            "${obtainQuest(playerLevel).replace("Nogartse", "xxxxxxx")}"
+        """.trimIndent()
+    )
 }
 
 fun forgeItem(
