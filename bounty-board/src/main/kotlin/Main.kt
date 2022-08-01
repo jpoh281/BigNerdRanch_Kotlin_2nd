@@ -7,6 +7,11 @@ var playerLevel: Int = 0
 
 fun main() {
 
+    var input: String = checkNotNull(readLine()){
+        // Throws an IllegalStateException with the message "No input was provided"
+        "No input provided"
+    }
+
     println("$HERO_NAME announces her presence to the world.")
     println("What level is $HERO_NAME?")
 
@@ -33,34 +38,45 @@ private fun obtainQuest(
     playerClass: String = "Paladin",
     hasBeFriendedBarbarians: Boolean = true,
     hasAngeredBarbarians: Boolean = false,
-): String? = when (playerLevel) {
-    1 -> "Meet Mr. Bubbles in the land of soft things."
-    in 2..5 -> {
-        val canTalkToBarbarians = !hasAngeredBarbarians && hasBeFriendedBarbarians || playerClass == "barbarian"
+): String? {
+   if(playerLevel <= 0){
+       throw InvalidPlayerLevelException()
+   }
 
-        if (canTalkToBarbarians) {
-            "Convince the barbarians to call off their invasion."
-        } else {
-            "Save the town from the barbarian invasions."
+    return when (playerLevel) {
+        1 -> "Meet Mr. Bubbles in the land of soft things."
+        in 2..5 -> {
+            val canTalkToBarbarians = !hasAngeredBarbarians && hasBeFriendedBarbarians || playerClass == "barbarian"
+
+            if (canTalkToBarbarians) {
+                "Convince the barbarians to call off their invasion."
+            } else {
+                "Save the town from the barbarian invasions."
+            }
         }
+        6 -> "Locate the enchanted sword."
+        7 -> "Recover the long-lost artifact of createion."
+        8 -> "Defeat Nogartse, bringer of death and eater of worlds."
+        else -> null
     }
-    6 -> "Locate the enchanted sword."
-    7 -> "Recover the long-lost artifact of createion."
-    8 -> "Defeat Nogartse, bringer of death and eater of worlds."
-    else -> null
 }
 
 private fun readBountyBoard() {
-    val quest: String? = obtainQuest(playerLevel)
 
-    val message: String = quest?.replace("Nogartse", "xxxxxxxx")
-        ?.let { censoredQuest ->
+    val message = try {
+        val quest: String? = obtainQuest(playerLevel)
 
-            """
+        quest?.replace("Nogartse", "xxxxxxxx")
+            ?.let { censoredQuest ->
+
+                """
             |$HERO_NAME approaches the bounty board. It reads:
             |   "$censoredQuest"
             """.trimMargin()
-        } ?: "$HERO_NAME approaches the bounty board, but it is blank."
+            } ?: "$HERO_NAME approaches the bounty board, but it is blank."
+    }catch (e: Exception){
+       "$HERO_NAME can't read what's on the bounty board"
+    }
 
     println(message)
 }
@@ -83,3 +99,5 @@ fun shouldReturnAString(): String {
     TODO()
     println("This is unreachable")
 }
+
+class InvalidPlayerLevelException() : IllegalArgumentException("Invalid player level (must be at least 1)")
