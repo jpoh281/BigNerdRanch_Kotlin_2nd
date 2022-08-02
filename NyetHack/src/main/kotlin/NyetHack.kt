@@ -12,6 +12,9 @@ fun main() {
 
 private fun createTitle(name: String): String {
     return when {
+        name.length > 10 -> "The Verbose"
+        name.reversed() == name -> "Bringer of Palindromes"
+        name.all {it.isUpperCase()} -> "The Bold"
         name.all { it.isDigit() } -> "The Identifiable"
         name.none { it.isLetter() } -> "The Witness Protection Member"
         name.count { it.lowercase() in "aeiou" } > 4 -> "The Master of Vowles"
