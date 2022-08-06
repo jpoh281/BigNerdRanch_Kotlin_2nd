@@ -16,10 +16,10 @@ fun visitTavern() {
     narrate("$heroName enters $TAVERN_NAME")
 
     println("*** Welcome to $TAVERN_NAME ***")
-    println(sortMenu().joinToString("\n"))
+    println(printSortedMenu())
 
-    narrate("There are sevaral items for sale:")
-    narrate(menuItems.joinToString())
+//    narrate("There are sevaral items for sale:")
+//    narrate(menuItems.joinToString())
 
 //    val patrons = mutableListOf("Eli", "Mordoc", "Sophie")
     val patrons : MutableSet<String> = mutableSetOf()
@@ -41,7 +41,7 @@ private fun placeOrder(patronName: String, menuItemName: String) {
     narrate("$TAVERN_MONSTER hands $patronName a $menuItemName")
 }
 
-private fun sortMenu(): List<String> {
+private fun printSortedMenu() {
 
     var longestMenuLength = 0
 
@@ -54,10 +54,23 @@ private fun sortMenu(): List<String> {
         it.length + 5
     }
 
-    val menuItems = List(menuData.size) {index ->
-        val (_, name, price) = menuData[index].split(",")
-        "${name.padEnd( longestMenuLength - price.length, '.')}$price"
+    var menuByCategory = menuData.groupBy{
+        val (type, _, _) = it.split(",")
+        type
     }
 
-    return menuItems
+    menuByCategory.forEach{ (category, menus) ->
+        println("\t\t~[$category]~")
+        println(menus.joinToString("\n") {
+            val (_, name, price) = it.split(",")
+            "${name.padEnd(longestMenuLength - price.length, '.')}$price"
+        })
+    }
+
+//    val menuItems = List(menuData.size) {index ->
+//        val (_, name, price) = menuData[index].split(",")
+//        "${name.padEnd( longestMenuLength - price.length, '.')}$price"
+//    }
+//
+//    return menuItems
 }
