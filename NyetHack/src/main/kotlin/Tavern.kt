@@ -1,4 +1,5 @@
 import java.io.File
+import java.util.*
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -41,8 +42,30 @@ fun visitTavern() {
     narrate("$heroName sees several patrons in the tavern:")
     narrate(patrons.joinToString())
 
-    val itemOfDay = patrons.flatMap { getFavoriteMenuItems(it) }.random()
-    narrate("The item of the day is $itemOfDay")
+    val favorites =patrons.flatMap { getFavoriteMenuItems(it) }
+
+    val favoritesCount = favorites.associate {
+        it to favorites.fold(0) { next, total ->
+            if (it == total) {
+                next + 1
+            } else {
+                next
+            }
+        }
+    }
+
+    val favoriteMenus = favoritesCount.filter {
+        it.value == favoritesCount.maxOf { count -> count.value }
+    }.toList().random();
+
+    println(favorites.toString())
+    println(favoritesCount.toString())
+    println(favoriteMenus.toString())
+
+    val itemOfDay = favorites.maxOf {
+        Collections.frequency(favorites, it)
+    }
+    narrate("The item of the day is $favoriteMenus")
 
     repeat(3) {
         placeOrder(patrons.random(), menuItems.random(), patronGold)
@@ -60,6 +83,12 @@ fun visitTavern() {
 
     narrate("There are still some patrons in the tavern")
     narrate(patrons.joinToString())
+
+    val gradesByStudent = mapOf("Josh" to 4.0, "Alex" to 2.0, "Jane" to 3.0)
+    val flipValues = gradesByStudent.map { (key, value) ->
+        value to key
+    }.toMap()
+    println(flipValues)
 }
 
 private fun getFavoriteMenuItems(patron: String): List<String> {
