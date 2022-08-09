@@ -1,25 +1,24 @@
 import java.io.File
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 private const val TAVERN_MONSTER = "Taernyl"
 private const val TAVERN_NAME = "$TAVERN_MONSTER's Folly"
 
-private val firstName = setOf("Alex", "Mordoc", "Sophie", "Tariq")
-private val lastName = setOf("Ironfoot", "Fernsworth", "Baggins", "Downstrider")
+private val firstNames = setOf("Alex", "Mordoc", "Sophie", "Tariq")
+private val lastNames = setOf("Ironfoot", "Fernsworth", "Baggins", "Downstrider")
 
-private val menuData = File("data/tavern-menu-data.txt").readText().split("\n")
-private val menuItems = List(menuData.size) {index ->
-    val (_, name, _) = menuData[index].split(",")
-    name
-}
-private val menuItemPrices = List(menuData.size) {index ->
-    val (_, name, price) = menuData[index].split(",")
+private val menuData = File("data/tavern-menu-data.txt").readText().split("\n").map { it.split(",") }
+
+private val menuItems = menuData.map { (_, name, _) -> name }
+
+private val menuItemPrices = menuData.associate { (_, name, price) ->
     name to price.toDouble()
-}.toMap()
+}
 
-private val menuItemTypes = List(menuData.size) {index ->
-    val (type, name, _) = menuData[index].split(",")
+private val menuItemTypes = menuData.associate { (type, name) ->
     name to type
-}.toMap()
+}
 
 
 fun visitTavern() {
@@ -28,37 +27,58 @@ fun visitTavern() {
     narrate(menuItems.joinToString())
 
 //    val patrons = mutableListOf("Eli", "Mordoc", "Sophie")
-    val patrons : MutableSet<String> = mutableSetOf()
+//    val patrons: MutableSet<String> = mutableSetOf()
+    val patrons: MutableSet<String> = firstNames.shuffled().zip(lastNames.shuffled()) { firstName, lastName ->
+        "$firstName $lastName"
+    }.toMutableSet()
+
     val patronGold = mutableMapOf(
         TAVERN_MONSTER to 86.00,
-        heroName to 4.50
+        heroName to 4.50,
+        *patrons.map { it to 6.00 }.toTypedArray()
     )
-
-    while (patrons.size < 5) {
-        patrons += "${firstName.random()} ${lastName.random()}"
-        val patronName = "${firstName.random()} ${lastName.random()}"
-        patrons += patronName
-        patronGold += patronName to 6.0
-    }
 
     narrate("$heroName sees several patrons in the tavern:")
     narrate(patrons.joinToString())
-    
 
-    repeat(3){
+    val itemOfDay = patrons.flatMap { getFavoriteMenuItems(it) }.random()
+    narrate("The item of the day is $itemOfDay")
+
+    repeat(3) {
         placeOrder(patrons.random(), menuItems.random(), patronGold)
     }
     displayPatronBalances(patronGold)
+    val departingPatrons: List<String> =
+        patrons.filter { patron -> patronGold.getOrDefault(patron, 0.0) < 4.0 }
 
+    patrons -= departingPatrons
+    patronGold -= departingPatrons
+
+    departingPatrons.forEach { patron ->
+        narrate("$heroName sees $patron departing the tavern")
+    }
+
+    narrate("There are still some patrons in the tavern")
+    narrate(patrons.joinToString())
 }
 
-private fun placeOrder(patronName: String, menuItemName: String, patronGold : MutableMap<String,Double>) {
+private fun getFavoriteMenuItems(patron: String): List<String> {
+    return when (patron) {
+        "Alex Ironfoot" -> menuItems.filter { menuItem ->
+            menuItemTypes[menuItem]?.contains("dessert") == true
+        }
+        else -> menuItems.shuffled().take(Random.nextInt(1..2))
+
+    }
+}
+
+private fun placeOrder(patronName: String, menuItemName: String, patronGold: MutableMap<String, Double>) {
     val itemPrice = menuItemPrices.getValue(menuItemName)
 
     narrate("$patronName speaks with $TAVERN_MONSTER to place an order")
 
-    if(itemPrice <= patronGold.getOrDefault(patronName, 0.0)) {
-        val action = when(menuItemTypes[menuItemName]) {
+    if (itemPrice <= patronGold.getOrDefault(patronName, 0.0)) {
+        val action = when (menuItemTypes[menuItemName]) {
             "shandy", "elixir" -> "pours"
             "meal" -> "serves"
             else -> "hands"
@@ -73,7 +93,7 @@ private fun placeOrder(patronName: String, menuItemName: String, patronGold : Mu
     }
 }
 
-private fun displayPatronBalances (patronGold: MutableMap<String, Double>){
+private fun displayPatronBalances(patronGold: MutableMap<String, Double>) {
     narrate("$heroName intuitively knows how much money each patron has")
     patronGold.forEach { (patron, balance) ->
         narrate("$patron has ${"%.2f".format(balance)} gold")
