@@ -2,10 +2,15 @@ package com.hdd.nyethack
 
 class Weapon(val name: String)
 
-class Player {
+class Player(
+    initialName: String,
+    val hometown: String = "Neversummer",
+    var healthPoints: Int,
+    val isImmortal: Boolean
+) {
     var weapon: Weapon? = Weapon("Mjolnir")
 
-    var name = "madrigal"
+    var name = initialName
         get() = field.replaceFirstChar { it.uppercase() }
         private set(value) {
             field = value.trim()
@@ -19,11 +24,39 @@ class Player {
             else -> "The Renowned Hero"
         }
 
+    val prophecy by lazy {
+        narrate("$name embarks on an quest to locate a fortune teller")
+        Thread.sleep(3000)
+        narrate("The fortune teller bestows a prophecy upon $name")
+
+        "An intrepid hero from $hometown shall som day " + listOf(
+            "form an unlikely band between two warring factions",
+            "take possession of an otherworldly blade",
+            "bring the gift of creation back to the world",
+            "best the world-eater"
+        ).random()
+    }
+
+    init {
+        require(healthPoints > 0) { "healthPoints must be greater than zero" }
+        require(name.isNotBlank()) { "Player must have a name" }
+    }
+
+    constructor(name: String) : this(
+        initialName = name,
+        healthPoints = 100,
+        isImmortal = false
+    ) {
+        if (name.equals("Jason", ignoreCase = true)) {
+            healthPoints = 500
+        }
+    }
+
     fun castFireball(numFireballs: Int = 2) {
         narrate("A glass of Fireball springs into existence (x$numFireballs)")
     }
 
-    fun changeName(newName: String){
+    fun changeName(newName: String) {
         narrate("$name legally changes their name to $newName")
         name = newName
     }
@@ -32,5 +65,10 @@ class Player {
         weapon?.let {
             println(it.name)
         }
+    }
+
+    fun prophesize() {
+        narrate("$name thinks about their future")
+        narrate("A fortune teller told Madrigal, \"$prophecy\"")
     }
 }
