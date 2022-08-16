@@ -104,6 +104,15 @@ object Game {
             "prophesize" -> {
                 player.prophesize()
             }
+            "ring" -> {
+                if(currentRoom is TownSquare){
+                    repeat(argument.toIntOrNull() ?: 1) {
+                        (currentRoom as TownSquare).ringBell()
+                    }
+                } else {
+
+                }
+            }
             "map" -> {
                 worldMap.forEach { iit ->
                     iit.forEach {
