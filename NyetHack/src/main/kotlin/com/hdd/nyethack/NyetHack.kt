@@ -62,7 +62,12 @@ object Game {
             currentRoom.enterRoom()
 
             print("> Enter your command: ")
-            GameInput(readLine()).processCommand()
+            val gameInput = GameInput(readLine())
+            if (gameInput.command == "exit") {
+                break
+            }
+
+            gameInput.processCommand()
         }
     }
 
@@ -87,13 +92,31 @@ object Game {
         fun processCommand() = when (command.lowercase()) {
             "move" -> {
                 val direction = Direction.values().firstOrNull { it.name.equals(argument, ignoreCase = true) }
-                if(direction != null){
+                if (direction != null) {
                     move(direction)
                 } else {
                     narrate("I don't know what direction that is")
                 }
             }
-            else -> narrate("I'm not sure what you're trying to do")
+            "fireball" -> {
+                player.castFireball(argument.toIntOrNull() ?: 2)
+            }
+            "prophesize" -> {
+                player.prophesize()
+            }
+            "map" -> {
+                worldMap.forEach { iit ->
+                    iit.forEach {
+                        if (it.description() == currentRoom.description()) {
+                            print("X ")
+                        } else {
+                            print("O ")
+                        }
+                    }
+                    println()
+                }
+            }
+                else -> narrate("I'm not sure what you're trying to do")
+            }
         }
     }
-}
