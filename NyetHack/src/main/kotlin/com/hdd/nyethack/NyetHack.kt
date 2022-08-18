@@ -1,5 +1,7 @@
 package com.hdd.nyethack
 
+import kotlin.random.Random
+import kotlin.random.nextInt
 import kotlin.system.exitProcess
 
 lateinit var player: Player
@@ -47,9 +49,38 @@ object Game {
 
     private val worldMap = listOf(
         listOf(TownSquare(), Tavern(), Room("Back Room")),
-        listOf(MonsterRoom("A Long Corridor"), Room("A Generic Room")),
-        listOf(MonsterRoom("The Dungeon"))
+        listOf(
+            MonsterRoom("A Long Corridor"),
+            Room("A Generic Room"),
+            MonsterRoom("The Dungeon", generateRandomMonster(true))
+        ),
+        listOf(
+            MonsterRoom("The Dungeon", generateRandomMonster(false)),
+            MonsterRoom("The Dungeon", generateRandomMonster(false)),
+            MonsterRoom("The Dungeon", generateRandomMonster(true))
+        ),
+        listOf(
+            MonsterRoom("The Dungeon", monster = generateRandomMonster(true)),
+            MonsterRoom("The Dungeon", generateRandomMonster(true))
+        )
     )
+
+    private fun generateRandomMonster(farAway: Boolean): Monster {
+        val int = Random.nextInt(20)
+        return when {
+            int > 17 -> {
+                if (farAway) {
+                    Dragon()
+                } else {
+                    Naga()
+                }
+            }
+            int % 2 == 1 -> {
+                Skeleton()
+            }
+            else -> Goblin()
+        }
+    }
 
     init {
         narrate("Welcome, adventure")
@@ -89,7 +120,7 @@ object Game {
         fun processCommand() = when (command.lowercase()) {
             "move" -> {
                 val direction = Direction.values().firstOrNull { it.name.equals(argument, ignoreCase = true) }
-                if(direction != null){
+                if (direction != null) {
                     move(direction)
                 } else {
                     narrate("I don't know what direction that is")
@@ -103,20 +134,20 @@ object Game {
     fun fight() {
         val monsterRoom = currentRoom as? MonsterRoom
         val currentMonster = monsterRoom?.monster
-        if(currentMonster == null){
+        if (currentMonster == null) {
             narrate("There's nothing to fight here")
             return
         }
 
-        while (player.healthPoints > 0 && currentMonster.healthPoints > 0){
+        while (player.healthPoints > 0 && currentMonster.healthPoints > 0) {
             player.attack(currentMonster)
-            if (currentMonster.healthPoints > 0){
+            if (currentMonster.healthPoints > 0) {
                 currentMonster.attack(player)
             }
             Thread.sleep(1000)
         }
 
-        if(player.healthPoints <= 0){
+        if (player.healthPoints <= 0) {
             narrate("You have been defeated! Thanks for playing")
             exitProcess(0)
         } else {
