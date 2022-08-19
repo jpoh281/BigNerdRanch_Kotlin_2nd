@@ -19,7 +19,6 @@ fun main() {
     player = Player(playerName)
 //    player.prophesize()
 
-
 //    player.castFireball()
 //    player.prophesize()
 
@@ -57,6 +56,24 @@ object Game {
         narrate("${player.name}, $mortality, has ${player.healthPoints} health points")
     }
 
+    fun sellLoot() {
+        when (val currentRoom = currentRoom){
+            is TownSquare -> {
+                player.inventory.forEach { item ->
+                    if (item is Sellable) {
+                        val sellPrice = currentRoom.sellLoot(item)
+                        narrate("Sold ${item.name} for $sellPrice gold")
+                        player.gold += sellPrice
+                    } else {
+                        narrate("Your ${item.name} can't be sold")
+                    }
+                }
+              player.inventory.removeAll { loot -> loot is Sellable }
+            }
+            else -> narrate("You cannot sell anything here")
+        }
+    }
+
     fun play() {
         while (true) {
             // Play NyetHack
@@ -81,6 +98,16 @@ object Game {
         }
     }
 
+    fun takeLoot() {
+        val loot = currentRoom.lootBox.takeLoot()
+        if (loot == null) {
+            narrate("${player.name} approaches the loot box, but it is empty")
+        } else {
+            narrate("${player.name} new has a ${loot.name}")
+            player.inventory += loot
+        }
+    }
+
     private class GameInput(arg: String?) {
         private val input = arg ?: ""
         val command = input.split(" ")[0]
@@ -89,13 +116,27 @@ object Game {
         fun processCommand() = when (command.lowercase()) {
             "move" -> {
                 val direction = Direction.values().firstOrNull { it.name.equals(argument, ignoreCase = true) }
-                if(direction != null){
+                if (direction != null) {
                     move(direction)
                 } else {
                     narrate("I don't know what direction that is")
                 }
             }
             "fight" -> fight()
+            "take" -> {
+                if (argument.equals("loot", ignoreCase = true)){
+                    takeLoot()
+                } else {
+                    narrate("I don't know what you're trying to take")
+                }
+            }
+            "sell" -> {
+                if(argument.equals("loot", ignoreCase = true)){
+                    sellLoot()
+                } else {
+                    narrate("I don't know what you're trying to sell")
+                }
+            }
             else -> narrate("I'm not sure what you're trying to do")
         }
     }
@@ -103,20 +144,20 @@ object Game {
     fun fight() {
         val monsterRoom = currentRoom as? MonsterRoom
         val currentMonster = monsterRoom?.monster
-        if(currentMonster == null){
+        if (currentMonster == null) {
             narrate("There's nothing to fight here")
             return
         }
 
-        while (player.healthPoints > 0 && currentMonster.healthPoints > 0){
+        while (player.healthPoints > 0 && currentMonster.healthPoints > 0) {
             player.attack(currentMonster)
-            if (currentMonster.healthPoints > 0){
+            if (currentMonster.healthPoints > 0) {
                 currentMonster.attack(player)
             }
             Thread.sleep(1000)
         }
 
-        if(player.healthPoints <= 0){
+        if (player.healthPoints <= 0) {
             narrate("You have been defeated! Thanks for playing")
             exitProcess(0)
         } else {
