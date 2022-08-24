@@ -87,15 +87,12 @@ object Game {
 
     fun move(direction: Direction) {
         val newPosition = currentPosition move direction
-        val newRoom = worldMap[newPosition]
+        val newRoom = worldMap[newPosition].orEmptyRoom()
 
-        if (newRoom != null) {
+
             narrate("The hero moves ${direction.name}")
             currentPosition = newPosition
             currentRoom = newRoom
-        } else {
-            narrate("You cannot move ${direction.name}")
-        }
     }
 
     fun takeLoot() {
