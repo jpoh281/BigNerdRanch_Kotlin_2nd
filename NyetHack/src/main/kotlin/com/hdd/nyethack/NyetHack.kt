@@ -87,7 +87,7 @@ object Game {
 
     fun move(direction: Direction) {
         val newPosition = direction.updateCoordinate(currentPosition)
-        val newRoom = worldMap.getOrNull(newPosition.y)?.get(newPosition.x)
+        val newRoom = worldMap[newPosition]
 
         if (newRoom != null) {
             narrate("The hero moves ${direction.name}")
