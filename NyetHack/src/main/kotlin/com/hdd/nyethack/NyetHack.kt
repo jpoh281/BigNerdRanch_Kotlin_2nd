@@ -12,7 +12,7 @@ fun main() {
 //        "The hero must have a name."
 //    }
 //
-//    com.hdd.nyethack.changeNarratorMood()
+    changeNarratorMood()
     narrate("Welcome to NyetHack!")
 
     val playerName = promptHeroName()
@@ -30,14 +30,14 @@ private fun promptHeroName(): String {
         "\u001b[33;1m$message\u001b[0m"
     }
 
-//    val input = readLine()
-//    require(input != null && input.isNotEmpty()){
-//        "The hero must have a name"
-//    }
-//    return input
+    val input = readLine()
+    require(input != null && input.isNotEmpty()){
+        "The hero must have a name"
+    }
+    return input
 
-    println("Madrigal")
-    return "Madrigal"
+//    println("Madrigal")
+//    return "Madrigal"
 }
 
 object Game {
