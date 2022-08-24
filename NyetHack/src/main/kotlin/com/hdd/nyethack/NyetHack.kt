@@ -4,6 +4,7 @@ import kotlin.system.exitProcess
 
 lateinit var player: Player
 
+
 fun main() {
 //    com.hdd.nyethack.narrate("A hero enters the town of Kronstadt. What is their name?") { message -> "\u001b[33;1m$message\u001b[0m" }
 //
@@ -13,7 +14,7 @@ fun main() {
 //    }
 //
     changeNarratorMood()
-    narrate("Welcome to NyetHack!")
+    narrate("Welcome to NyetHack!".frame(5))
 
     val playerName = promptHeroName()
     player = Player(playerName)
