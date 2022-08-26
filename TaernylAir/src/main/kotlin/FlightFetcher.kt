@@ -12,7 +12,7 @@ fun main() {
     runBlocking {
         println("Start")
         launch {
-            val flight = fetchFlight()
+            val flight = fetchFlight("HJP")
             println(flight)
         }
         println("Finished")
@@ -20,11 +20,22 @@ fun main() {
     }
 }
 
-suspend fun fetchFlight(): String {
+suspend fun fetchFlight(passengerName: String): FlightStatus {
     val client = HttpClient(CIO)
 
-    val flightResponse = client.get<String>(FLIGHT_ENDPOINT)
-    val loyaltyResponse = client.get<String>(LOYALTY_ENDPOINT)
+    println("Started fetching flight info")
+    val flightResponse = client.get<String>(FLIGHT_ENDPOINT).also {
+        println("Finished fetching flight info")
+    }
 
-    return "$flightResponse\n$loyaltyResponse"
+    println("Started fetching loyalty info")
+    val loyaltyResponse = client.get<String>(LOYALTY_ENDPOINT).also {
+        println("Finished fetching loyalty info")
+    }
+
+    println("Combining flight data")
+    return FlightStatus.parse(
+        passengerName = passengerName, flightResponse = flightResponse,
+        loyaltyResponse = loyaltyResponse
+    )
 } 
