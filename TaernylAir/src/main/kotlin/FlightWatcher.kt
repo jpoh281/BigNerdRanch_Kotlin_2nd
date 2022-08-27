@@ -1,6 +1,6 @@
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 fun main() {
@@ -11,10 +11,20 @@ fun main() {
             "${it.passengerName} (${it.flightNumber})"
         }
         println("Found flights for $flightDescriptions")
-        
+        val flightsAtGate = MutableStateFlow(flights.size)
 
-        flights.forEach {
-            watchFlight(it)
+        launch {
+            flightsAtGate.takeWhile { it > 0 }.onCompletion {
+                println("Finished tracking all flights")
+            }.collect { flightCount ->
+                println("There are $flightCount flights being tracked")
+            }
+        }
+        launch {
+            flights.forEach {
+                watchFlight(it)
+                flightsAtGate.value = flightsAtGate.value - 1
+            }
         }
     }
 }
@@ -31,7 +41,9 @@ suspend fun watchFlight(initialFlight: FlightStatus) {
         }
     }
 
-    currentFlight.collect {
+    currentFlight.onCompletion {
+        println("Finished tracking $passengerName's flight")
+    }.collect {
         val status = when (it.boardingState) {
             BoardingState.FlightCanceled -> "Your flight was canceled"
             BoardingState.BoardingNotStarted -> "Boarding will start soon"
@@ -41,8 +53,6 @@ suspend fun watchFlight(initialFlight: FlightStatus) {
         } + " (Flight departs in ${it.departureTimeInMinute} minutes)"
         println("$passengerName $status")
     }
-
-    println("Finished tracking $passengerName's flight")
 }
 
 suspend fun fetchFlights(passengerNames: List<String> = listOf("Madrigal", "Polarcubis")) =
