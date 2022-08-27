@@ -1,4 +1,5 @@
 import io.ktor.client.*
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.*
@@ -24,7 +25,7 @@ suspend fun fetchFlight(passengerName: String): FlightStatus = coroutineScope {
 
     val flightResponse = async {
         println("Started fetching flight info")
-        client.get<String>(FLIGHT_ENDPOINT).also {
+        client.get(FLIGHT_ENDPOINT).body<String>().also {
             println("Finished fetching flight info")
         }
     }
@@ -32,7 +33,7 @@ suspend fun fetchFlight(passengerName: String): FlightStatus = coroutineScope {
     val loyaltyResponse = async {
         println("Started fetching loyalty info")
 
-        client.get<String>(LOYALTY_ENDPOINT).also {
+        client.get(LOYALTY_ENDPOINT).body<String>().also {
             println("Finished fetching loyalty info")
         }
     }
