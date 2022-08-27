@@ -18,7 +18,8 @@ fun main() {
     }
 }
 
-fun watchFlight(initialFlight: FlightStatus) {
+suspend fun watchFlight(initialFlight: FlightStatus) {
+    val passengerName = initialFlight.passengerName
     val currentFlight: Flow<FlightStatus> = flow {
         var flight = initialFlight
         repeat(5) {
@@ -27,6 +28,12 @@ fun watchFlight(initialFlight: FlightStatus) {
             flight = flight.copy(departureTimeInMinute = flight.departureTimeInMinute - 1)
         }
     }
+
+    currentFlight.collect {
+        println("$passengerName : $it")
+    }
+
+    println("Finished tracking $passengerName's flight")
 }
 
 suspend fun fetchFlights(passengerNames: List<String> = listOf("Madrigal", "Polarcubis")) =
