@@ -27,6 +27,8 @@ fun main() {
     }
 }
 
+val translator = {utterance: String -> println(utterance.lowercase().replaceFirstChar { it.uppercase() }) }
+
 fun makeProclamation() = "Greeting, beast!"
 
 @JvmOverloads
