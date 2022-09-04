@@ -1,3 +1,4 @@
+@file:JvmName("Hero")
 fun main(){
     val adversary = Jhava()
     println(adversary.utterGreeting())
@@ -11,7 +12,26 @@ fun main(){
 
     adversary.greeting = "Hello, Hero."
     println(adversary.utterGreeting())
+
+    adversary.offerFood()
 }
 
-class Hero {
+fun makeProclamation() = "Greeting, beast!"
+
+@JvmOverloads
+fun handOverFood(leftHand: String = "berries", rightHand:String = "beef"){
+    println("Mmmm... you hand over some delicious $leftHand and $rightHand")
+}
+
+class Spellbook {
+    @JvmField
+    val spells = listOf("Magic Ms. L", "Lay on Hans")
+
+    companion object {
+        @JvmField
+        var maxSpellCount = 10
+
+        @JvmStatic
+        fun getSpellbookGreeting() = println("I am the Great Grimoire!")
+    }
 }
