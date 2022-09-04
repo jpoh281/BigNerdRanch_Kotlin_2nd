@@ -8,6 +8,9 @@ fun main(){
     val adversaryHitPoints: Int = adversary.hitPoints
     println(adversaryHitPoints.coerceAtMost(100))
     println(adversaryHitPoints.javaClass)
+
+    adversary.greeting = "Hello, Hero."
+    println(adversary.utterGreeting())
 }
 
 class Hero {
